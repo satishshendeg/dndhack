@@ -19,7 +19,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -33,34 +36,56 @@ import com.google.common.util.concurrent.ListenableFuture
 
 /** Main activity for the app.  */
 class ExampleRichReceiver : AppCompatActivity() {
-    private lateinit var mAttachmentsRepo: AttachmentsRepo
-    private lateinit var mAttachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
+
+    private val attachmentsRepo by lazy {
+        AttachmentsRepo(this)
+    }
+    private val attachmentsRecyclerViewAdapter by lazy {
+        AttachmentsRecyclerViewAdapter(attachmentsRepo.allUris)
+    }
+    private val receiver by lazy {
+        MyReceiver(attachmentsRepo, attachmentsRecyclerViewAdapter)
+    }
+
+    private val pickMultipleMedia =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+            // Callback is invoked after the user selects media items or closes the
+            // photo picker.
+            if (uris.isNotEmpty()) {
+                receiver.receive(this, uris)
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_example_rich_receiver)
+
         val toolbar: Toolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(toolbar)
-        AttachmentsRepo(this).let { attachmentsRepo ->
-            mAttachmentsRepo = attachmentsRepo
-            val attachmentsRecyclerView: RecyclerView = findViewById(R.id.attachments_recycler_view)
-            attachmentsRecyclerView.setHasFixedSize(true)
-            AttachmentsRecyclerViewAdapter(attachmentsRepo.allUris).let { attachmentsRecyclerViewAdapter ->
-                mAttachmentsRecyclerViewAdapter = attachmentsRecyclerViewAdapter
-                attachmentsRecyclerView.setAdapter(mAttachmentsRecyclerViewAdapter)
-                MyReceiver(attachmentsRepo, attachmentsRecyclerViewAdapter).let { receiver ->
-                    ViewCompat.setOnReceiveContentListener(
-                        findViewById(R.id.container),
-                        MyReceiver.SUPPORTED_MIME_TYPES,
-                        receiver
-                    )
-                    ViewCompat.setOnReceiveContentListener(
-                        findViewById(R.id.text_input),
-                        MyReceiver.SUPPORTED_MIME_TYPES,
-                        receiver
-                    )
-                }
-            }
+
+        val attachmentsRecyclerView: RecyclerView = findViewById(R.id.attachments_recycler_view)
+        attachmentsRecyclerView.setHasFixedSize(true)
+        attachmentsRecyclerView.setAdapter(this.attachmentsRecyclerViewAdapter)
+
+        // Attach this receiver to both the text field...
+        ViewCompat.setOnReceiveContentListener(
+            findViewById(R.id.text_input),
+            MyReceiver.SUPPORTED_MIME_TYPES,
+            receiver
+        )
+        // ... and its larger container
+        ViewCompat.setOnReceiveContentListener(
+            findViewById(R.id.container),
+            MyReceiver.SUPPORTED_MIME_TYPES,
+            receiver
+        )
+
+        // Explore the possibility to support a file picker as well
+        //filePicker.attach(findViewById(R.id.text_input), MyReceiver.SUPPORTED_MIME_TYPES)
+        findViewById<AppCompatImageButton>(R.id.photo_picker_action).setOnClickListener {
+            pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
         }
     }
 
@@ -73,22 +98,22 @@ class ExampleRichReceiver : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_clear_attachments -> {
                 deleteAllAttachments()
-                return true
+                true
             }
             else -> false
         }
     }
 
     private fun deleteAllAttachments() {
-        val attachmentsCount = mAttachmentsRecyclerViewAdapter.itemCount
+        val attachmentsCount = attachmentsRecyclerViewAdapter.itemCount
         val deleteAllFuture: ListenableFuture<Void?> = MyExecutors.bg().submit<Void?> {
-            mAttachmentsRepo.deleteAll()
+            attachmentsRepo.deleteAll()
             null
         }
         Futures.addCallback(deleteAllFuture, object : FutureCallback<Void?> {
             override fun onSuccess(result: Void?) {
-                mAttachmentsRecyclerViewAdapter.clearAttachments()
-                mAttachmentsRecyclerViewAdapter.notifyItemRangeRemoved(0, attachmentsCount)
+                attachmentsRecyclerViewAdapter.clearAttachments()
+                attachmentsRecyclerViewAdapter.notifyItemRangeRemoved(0, attachmentsCount)
             }
 
             override fun onFailure(t: Throwable) {

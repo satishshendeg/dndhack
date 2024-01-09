@@ -36,8 +36,8 @@ import java.io.FileNotFoundException
  * handling for all other content to the platform.
  */
 internal class MyReceiver(
-    private val mAttachmentsRepo: AttachmentsRepo,
-    private val mAttachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
+    private val attachmentsRepo: AttachmentsRepo,
+    private val attachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
 ) : OnReceiveContentListener {
     companion object {
         val SUPPORTED_MIME_TYPES = arrayOf("image/*")
@@ -83,17 +83,19 @@ internal class MyReceiver(
      * the content).
      */
     private fun receive(context: Context, payload: ContentInfoCompat) {
+        receive(context, collectUris(payload.clip))
+    }
+
+    fun receive(context: Context, uris: List<Uri>) {
         val applicationContext = context.applicationContext
-        val contentResolver = applicationContext.contentResolver
         val addAttachmentsFuture = bg().submit<List<Uri>> {
-            val uris = collectUris(payload.clip)
             val localUris: MutableList<Uri> = ArrayList(uris.size)
             for (uri in uris) {
-                val mimeType = contentResolver.getType(uri)
+                val mimeType = applicationContext.contentResolver.getType(uri)
                 Log.i("ReceiveContentDemo", "Processing URI: $uri (type: $mimeType)")
                 if (ClipDescription.compareMimeTypes(mimeType, "image/*")) {
                     // Read the image at the given URI and write it to private storage.
-                    localUris.add(mAttachmentsRepo.write(uri))
+                    localUris.add(attachmentsRepo.write(uri))
                 } else {
                     showMessage(applicationContext, uri, mimeType!!)
                 }
@@ -104,13 +106,13 @@ internal class MyReceiver(
             override fun onSuccess(localUris: List<Uri>) {
                 // Show the image in the UI by passing the URI pointing to the locally stored copy
                 // to the recycler view adapter.
-                mAttachmentsRecyclerViewAdapter.addAttachments(localUris)
-                mAttachmentsRecyclerViewAdapter.notifyDataSetChanged()
-                Log.i("ReceiveContentDemo", "Processed content: $payload")
+                attachmentsRecyclerViewAdapter.addAttachments(localUris)
+                attachmentsRecyclerViewAdapter.notifyDataSetChanged()
+                Log.i("ReceiveContentDemo", "Processed content: $localUris")
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("ReceiveContentDemo", "Error processing content: $payload", t)
+                Log.e("ReceiveContentDemo", "Error processing content", t)
             }
         }, main())
     }

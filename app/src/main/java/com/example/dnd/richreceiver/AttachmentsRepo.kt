@@ -31,7 +31,7 @@ import java.util.UUID
  * Stores attachments as files in the app's private storage directory (see
  * [Context.getDataDir], [Context.getFilesDir], etc).
  */
-internal class AttachmentsRepo(private val mContext: Context) {
+internal class AttachmentsRepo(private val context: Context) {
     companion object {
         // This matches the name declared in AndroidManifest.xml
         private const val FILE_PROVIDER_AUTHORITY =
@@ -40,7 +40,7 @@ internal class AttachmentsRepo(private val mContext: Context) {
 
     val allUris: ImmutableList<Uri>
         get() {
-            val files = mAttachmentsDir.listFiles()
+            val files = attachmentsDir.listFiles()
             if (files == null || files.size == 0) {
                 return ImmutableList.of()
             }
@@ -51,22 +51,22 @@ internal class AttachmentsRepo(private val mContext: Context) {
             return uris.build()
         }
 
-    private val mAttachmentsDir: File = File(mContext.filesDir, "attachments")
+    private val attachmentsDir: File = File(context.filesDir, "attachments")
 
     /**
      * Reads the content at the given URI and writes it to private storage. Then returns a content
      * URI referencing the newly written file.
      */
     fun write(uri: Uri): Uri {
-        val contentResolver = mContext.contentResolver
+        val contentResolver = context.contentResolver
         val mimeType = contentResolver.getType(uri)
         val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
         try {
             contentResolver.openInputStream(uri).use { `is` ->
                 requireNotNull(`is`) { uri.toString() }
-                mAttachmentsDir.mkdirs()
+                attachmentsDir.mkdirs()
                 val fileName = "a-" + UUID.randomUUID().toString() + "." + ext
-                val newAttachment = File(mAttachmentsDir, fileName)
+                val newAttachment = File(attachmentsDir, fileName)
                 FileOutputStream(newAttachment).use { os -> ByteStreams.copy(`is`, os) }
                 val resultUri = getUriForFile(newAttachment)
                 Log.i("ReceiveContentDemo", "Saved content: originalUri=$uri, resultUri=$resultUri")
@@ -78,13 +78,13 @@ internal class AttachmentsRepo(private val mContext: Context) {
     }
 
     fun deleteAll() {
-        val files = mAttachmentsDir.listFiles() ?: return
+        val files = attachmentsDir.listFiles() ?: return
         for (file in files) {
             file.delete()
         }
     }
 
     private fun getUriForFile(file: File): Uri {
-        return FileProvider.getUriForFile(mContext, FILE_PROVIDER_AUTHORITY, file)
+        return FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITY, file)
     }
 }

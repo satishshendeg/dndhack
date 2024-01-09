@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Android DnD</string>
     <string name="app_menu_item_clear_attachments">Clear attachments</string>
-    <string name="text_input_default_text">Try inserting text, images and other content
-        using copy/paste or drag-and-drop</string>
+    <string name="text_input_default_text">Insert text, images and other content using copy/paste or
+        drag-and-drop</string>
 </resources>

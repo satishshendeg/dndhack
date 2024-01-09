@@ -9,27 +9,27 @@ import com.example.dnd.R
 
 internal class AttachmentsRecyclerViewAdapter(attachments: List<Uri>?) :
     RecyclerView.Adapter<AttachmentsRecyclerViewAdapter.MyViewHolder>() {
-    internal class MyViewHolder(var mAttachmentThumbnailView: AppCompatImageView) :
+    internal class MyViewHolder(var attachmentThumbnailView: AppCompatImageView) :
         RecyclerView.ViewHolder(
-            mAttachmentThumbnailView
+            attachmentThumbnailView
         )
 
-    private val mAttachments: MutableList<Uri>
+    private val attachments: MutableList<Uri>
 
     init {
-        mAttachments = ArrayList(attachments)
+        this.attachments = ArrayList(attachments)
     }
 
     fun addAttachments(uris: List<Uri>) {
-        mAttachments.addAll(uris)
+        attachments.addAll(uris)
     }
 
     fun clearAttachments() {
-        mAttachments.clear()
+        attachments.clear()
     }
 
     override fun getItemCount(): Int {
-        return mAttachments.size
+        return attachments.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -39,8 +39,8 @@ internal class AttachmentsRecyclerViewAdapter(attachments: List<Uri>?) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val uri = mAttachments[position]
-        holder.mAttachmentThumbnailView.setImageURI(uri)
-        holder.mAttachmentThumbnailView.clipToOutline = true
+        val uri = attachments[position]
+        holder.attachmentThumbnailView.setImageURI(uri)
+        holder.attachmentThumbnailView.clipToOutline = true
     }
 }
