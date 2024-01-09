@@ -23,8 +23,8 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.example.dnd.richreceiver.MyExecutors.bg
-import com.example.dnd.richreceiver.MyExecutors.main
+import com.example.dnd.richreceiver.Executors.bg
+import com.example.dnd.richreceiver.Executors.main
 import androidx.core.view.ContentInfoCompat
 import androidx.core.view.OnReceiveContentListener
 import com.google.common.util.concurrent.FutureCallback
@@ -35,7 +35,7 @@ import java.io.FileNotFoundException
  * Sample [OnReceiveContentListener] implementation that accepts all URIs, and delegates
  * handling for all other content to the platform.
  */
-internal class MyReceiver(
+internal class MediaReceiver(
     private val attachmentsRepo: AttachmentsRepo,
     private val attachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
 ) : OnReceiveContentListener {
@@ -92,7 +92,7 @@ internal class MyReceiver(
             val localUris: MutableList<Uri> = ArrayList(uris.size)
             for (uri in uris) {
                 val mimeType = applicationContext.contentResolver.getType(uri)
-                Log.i("ReceiveContentDemo", "Processing URI: $uri (type: $mimeType)")
+                Log.i("MediaReceiver", "Processing URI: $uri (type: $mimeType)")
                 if (ClipDescription.compareMimeTypes(mimeType, "image/*")) {
                     // Read the image at the given URI and write it to private storage.
                     localUris.add(attachmentsRepo.write(uri))
@@ -108,11 +108,11 @@ internal class MyReceiver(
                 // to the recycler view adapter.
                 attachmentsRecyclerViewAdapter.addAttachments(localUris)
                 attachmentsRecyclerViewAdapter.notifyDataSetChanged()
-                Log.i("ReceiveContentDemo", "Processed content: $localUris")
+                Log.i("MediaReceiver", "Processed content: $localUris")
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("ReceiveContentDemo", "Error processing content", t)
+                Log.e("MediaReceiver", "Error processing content", t)
             }
         }, main())
     }
@@ -133,13 +133,13 @@ internal class MyReceiver(
                 fd = contentResolver.openAssetFileDescriptor(uri, "r")
                 fd!!.length
             } catch (e: FileNotFoundException) {
-                Log.e("ReceiveContentDemo", "Error opening content URI: $uri", e)
+                Log.e("MediaReceiver", "Error opening content URI: $uri", e)
                 return@execute
             } finally {
                 fd?.close()
             }
             val msg = "Content of type $mimeType ($lengthBytes bytes): $uri"
-            Log.i("ReceiveContentDemo", msg)
+            Log.i("MediaReceiver", msg)
             main().execute { Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show() }
         }
     }

@@ -28,8 +28,8 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dnd.richreceiver.AttachmentsRecyclerViewAdapter
 import com.example.dnd.richreceiver.AttachmentsRepo
-import com.example.dnd.richreceiver.MyExecutors
-import com.example.dnd.richreceiver.MyReceiver
+import com.example.dnd.richreceiver.Executors
+import com.example.dnd.richreceiver.MediaReceiver
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -44,7 +44,7 @@ class ExampleRichReceiver : AppCompatActivity() {
         AttachmentsRecyclerViewAdapter(attachmentsRepo.allUris)
     }
     private val receiver by lazy {
-        MyReceiver(attachmentsRepo, attachmentsRecyclerViewAdapter)
+        MediaReceiver(attachmentsRepo, attachmentsRecyclerViewAdapter)
     }
 
     private val pickMultipleMedia =
@@ -72,13 +72,13 @@ class ExampleRichReceiver : AppCompatActivity() {
         // Attach this receiver to both the text field...
         ViewCompat.setOnReceiveContentListener(
             findViewById(R.id.text_input),
-            MyReceiver.SUPPORTED_MIME_TYPES,
+            MediaReceiver.SUPPORTED_MIME_TYPES,
             receiver
         )
         // ... and its larger container
         ViewCompat.setOnReceiveContentListener(
             findViewById(R.id.container),
-            MyReceiver.SUPPORTED_MIME_TYPES,
+            MediaReceiver.SUPPORTED_MIME_TYPES,
             receiver
         )
 
@@ -106,7 +106,7 @@ class ExampleRichReceiver : AppCompatActivity() {
 
     private fun deleteAllAttachments() {
         val attachmentsCount = attachmentsRecyclerViewAdapter.itemCount
-        val deleteAllFuture: ListenableFuture<Void?> = MyExecutors.bg().submit<Void?> {
+        val deleteAllFuture: ListenableFuture<Void?> = Executors.bg().submit<Void?> {
             attachmentsRepo.deleteAll()
             null
         }
@@ -117,9 +117,9 @@ class ExampleRichReceiver : AppCompatActivity() {
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("ReceiveContentDemo", "Error deleting attachments", t)
+                Log.e("ExampleRichReceiver", "Error deleting attachments", t)
             }
-        }, MyExecutors.main())
+        }, Executors.main())
     }
 
 }

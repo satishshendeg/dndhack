@@ -23,15 +23,12 @@ import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-internal object MyExecutors {
+internal object Executors {
     private val BG = MoreExecutors.listeningDecorator(Executors.newSingleThreadScheduledExecutor())
     private val MAIN_HANDLER = Handler(Looper.getMainLooper())
     private val MAIN_EXECUTOR = Executor { runnable: Runnable? ->
-        if (!MAIN_HANDLER.post(
-                runnable!!
-            )
-        ) {
-            Log.e("ReceiveContentDemo", "Failed to post runnable on main thread")
+        if (!MAIN_HANDLER.post(runnable!!)) {
+            Log.e("Executors", "Failed to post runnable on main thread")
         }
     }
 

@@ -41,7 +41,7 @@ internal class AttachmentsRepo(private val context: Context) {
     val allUris: ImmutableList<Uri>
         get() {
             val files = attachmentsDir.listFiles()
-            if (files == null || files.size == 0) {
+            if (files == null || files.isEmpty()) {
                 return ImmutableList.of()
             }
             val uris = ImmutableList.builderWithExpectedSize<Uri>(files.size)
@@ -62,14 +62,17 @@ internal class AttachmentsRepo(private val context: Context) {
         val mimeType = contentResolver.getType(uri)
         val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
         try {
-            contentResolver.openInputStream(uri).use { `is` ->
-                requireNotNull(`is`) { uri.toString() }
+            contentResolver.openInputStream(uri).use { input ->
+                requireNotNull(input) { uri.toString() }
                 attachmentsDir.mkdirs()
                 val fileName = "a-" + UUID.randomUUID().toString() + "." + ext
                 val newAttachment = File(attachmentsDir, fileName)
-                FileOutputStream(newAttachment).use { os -> ByteStreams.copy(`is`, os) }
+                FileOutputStream(newAttachment).use { output ->
+                    // Copy the file
+                    ByteStreams.copy(input, output)
+                }
                 val resultUri = getUriForFile(newAttachment)
-                Log.i("ReceiveContentDemo", "Saved content: originalUri=$uri, resultUri=$resultUri")
+                Log.i("AttachmentsRepo", "Saved content: originalUri=$uri, resultUri=$resultUri")
                 return resultUri
             }
         } catch (e: IOException) {
