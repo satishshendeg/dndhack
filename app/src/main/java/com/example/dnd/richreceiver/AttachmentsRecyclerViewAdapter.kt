@@ -1,6 +1,7 @@
 package com.example.dnd.richreceiver
 
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
@@ -40,7 +41,13 @@ internal class AttachmentsRecyclerViewAdapter(attachments: List<Uri>?) :
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val uri = attachments[position]
-        holder.attachmentThumbnailView.setImageURI(uri)
-        holder.attachmentThumbnailView.clipToOutline = true
+        holder.attachmentThumbnailView.apply {
+            setImageURI(uri)
+            if (drawable == null) {
+                Log.d("AttachmentsRecyclerViewAdapter", "missing image drawable; $uri may have failed to load")
+                setImageResource(R.drawable.ic_broken_image)
+            }
+            clipToOutline = true
+        }
     }
 }
