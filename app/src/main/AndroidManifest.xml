@@ -24,6 +24,19 @@
         </activity>
         <activity android:name=".ExampleViewActivity" />
         <activity android:name=".ExampleDndHelperActivity" />
+        <activity
+            android:name=".ExampleRichReceiver"
+            android:theme="@style/Theme.AppRichReceiver" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.dnd.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

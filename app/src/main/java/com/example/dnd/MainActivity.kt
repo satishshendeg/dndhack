@@ -14,12 +14,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+
         viewBinding.btnViewImpl.setOnClickListener {
             startActivity(Intent(this, ExampleViewActivity::class.java))
         }
 
         viewBinding.btnDnDHelperImpl.setOnClickListener {
             startActivity(Intent(this, ExampleDndHelperActivity::class.java))
+        }
+
+        viewBinding.btnRichReceiver.setOnClickListener {
+            startActivity(Intent(this, ExampleRichReceiver::class.java))
         }
     }
 }

@@ -19,10 +19,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Using Helper"
-        app:layout_constraintBottom_toTopOf="@id/btnComposeImpl"
+        app:layout_constraintBottom_toTopOf="@id/btnRichReceiver"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnViewImpl" />
+
+    <Button
+        android:id="@+id/btnRichReceiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Using Rich Receiver"
+        app:layout_constraintBottom_toTopOf="@id/btnComposeImpl"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnDnDHelperImpl" />
 
     <Button
         android:id="@+id/btnComposeImpl"
@@ -32,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btnToOtherApp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnDnDHelperImpl" />
+        app:layout_constraintTop_toBottomOf="@id/btnRichReceiver" />
 
     <Button
         android:id="@+id/btnToOtherApp"
