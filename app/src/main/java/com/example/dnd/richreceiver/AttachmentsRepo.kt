@@ -20,12 +20,17 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.common.collect.ImmutableList
 import com.google.common.io.ByteStreams
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.LinkedList
 import java.util.UUID
+
+class Attachments : LinkedList<Uri>()
 
 /**
  * Stores attachments as files in the app's private storage directory (see
@@ -38,20 +43,27 @@ internal class AttachmentsRepo(private val context: Context) {
             "com.example.dnd.fileprovider"
     }
 
+    val list = MutableLiveData<Attachments>()
+
     val size: Int
         get() = allUris.size
 
     val allUris: List<Uri>
         get() {
-            val files = attachmentsDir.listFiles()
-            if (files == null || files.isEmpty()) {
-                return ImmutableList.of()
+            val files = attachmentsDir.listFiles().let {
+                if (it == null || it.isEmpty()) {
+                    emptyArray<File>()
+                } else {
+                    it
+                }
             }
-            val uris = ImmutableList.builderWithExpectedSize<Uri>(files.size)
+            val uris = Attachments()
             for (file in files) {
-                uris.add(getUriForFile(file))
+                val uri = getUriForFile(file)
+                uris.add(uri)
             }
-            return uris.build()
+            list.value = uris
+            return uris
         }
 
     private val attachmentsDir: File = File(context.filesDir, "attachments")
@@ -84,15 +96,18 @@ internal class AttachmentsRepo(private val context: Context) {
         }
     }
 
-    fun delete(position: Int) {
+    fun delete(position: Int): List<Uri> {
         attachmentsDir.listFiles()?.getOrNull(position)?.delete()
+        return allUris
     }
 
-    fun deleteAll() {
-        val files = attachmentsDir.listFiles() ?: return
-        for (file in files) {
-            file.delete()
+    fun deleteAll(): List<Uri> {
+        attachmentsDir.listFiles()?.let { files ->
+            for (file in files) {
+                file.delete()
+            }
         }
+        return allUris
     }
 
     private fun getUriForFile(file: File): Uri {

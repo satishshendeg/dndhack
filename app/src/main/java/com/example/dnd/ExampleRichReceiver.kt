@@ -15,17 +15,22 @@
  */
 package com.example.dnd
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dnd.richreceiver.Attachments
 import com.example.dnd.richreceiver.AttachmentsRecyclerViewAdapter
 import com.example.dnd.richreceiver.AttachmentsRepo
 import com.example.dnd.richreceiver.Executors
@@ -65,9 +70,14 @@ class ExampleRichReceiver : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(toolbar)
 
-        findViewById<RecyclerView>(R.id.attachments_list).apply {
+        val list = findViewById<RecyclerView>(R.id.attachments_list).apply {
             setHasFixedSize(true)
             setAdapter(attachmentsRecyclerViewAdapter)
+        }
+
+        attachmentsRepo.list.observe(this) {
+            // Hide the list if there are no attachments
+            list.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
         }
 
         // Attach this receiver to both the text field...
@@ -101,6 +111,7 @@ class ExampleRichReceiver : AppCompatActivity() {
                 deleteAllAttachments()
                 true
             }
+
             else -> false
         }
     }
