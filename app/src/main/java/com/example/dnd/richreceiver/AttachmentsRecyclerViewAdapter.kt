@@ -1,53 +1,42 @@
 package com.example.dnd.richreceiver
 
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dnd.R
 
-internal class AttachmentsRecyclerViewAdapter(attachments: List<Uri>?) :
-    RecyclerView.Adapter<AttachmentsRecyclerViewAdapter.MyViewHolder>() {
-    internal class MyViewHolder(var attachmentThumbnailView: AppCompatImageView) :
-        RecyclerView.ViewHolder(
-            attachmentThumbnailView
-        )
+internal class AttachmentsRecyclerViewAdapter(private val attachments: AttachmentsRepo) :
+    RecyclerView.Adapter<AttachmentsRecyclerViewAdapter.ViewHolder>() {
 
-    private val attachments: MutableList<Uri>
-
-    init {
-        this.attachments = ArrayList(attachments)
-    }
-
-    fun addAttachments(uris: List<Uri>) {
-        attachments.addAll(uris)
-    }
-
-    fun clearAttachments() {
-        attachments.clear()
-    }
+    internal class ViewHolder(
+        parent: ViewGroup,
+        var attachmentThumbnailView: AppCompatImageView,
+        var deleteAttachment: AppCompatImageButton
+    ) : RecyclerView.ViewHolder(parent)
 
     override fun getItemCount(): Int {
         return attachments.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.attachment, parent, false) as AppCompatImageView
-        return MyViewHolder(view)
+            .inflate(R.layout.attachment, parent, false) as ViewGroup
+        return ViewHolder(
+            view,
+            view.findViewById(R.id.attachment_thumbnail),
+            view.findViewById(R.id.delete_attachment)
+        )
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val uri = attachments[position]
-        holder.attachmentThumbnailView.apply {
-            setImageURI(uri)
-            if (drawable == null) {
-                Log.d("AttachmentsRecyclerViewAdapter", "missing image drawable; $uri may have failed to load")
-                setImageResource(R.drawable.ic_broken_image)
-            }
-            clipToOutline = true
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val uri = attachments.allUris[position]
+        holder.attachmentThumbnailView.setImageURI(uri)
+        holder.deleteAttachment.setOnClickListener {
+            attachments.delete(holder.adapterPosition)
+            notifyItemRemoved(position)
         }
     }
+
 }

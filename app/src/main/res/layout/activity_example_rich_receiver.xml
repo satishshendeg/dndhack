@@ -14,76 +14,80 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/app_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="18dp"
         android:background="@drawable/container_background"
-        android:orientation="vertical"
-        android:padding="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/attachments"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/attachments_recycler_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:clipChildren="false"
-                android:orientation="horizontal"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="6dp"
-                app:layoutManager="LinearLayoutManager" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/photo_picker_action"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="0dp"
-                android:padding="0dp"
-                android:src="@drawable/ic_attach" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        android:padding="0dp">
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/text_input"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="2dp"
+            android:background="@null"
             android:gravity="bottom"
-            android:paddingTop="0dp"
-            android:hint="@string/text_input_default_text" />
+            android:hint="@string/text_input_default_text"
+            android:padding="12dp"
+            app:layout_constraintEnd_toStartOf="@id/photo_picker_action"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/input_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="text_input, photo_picker_action" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attachments_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp"
+            app:layoutManager="LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/input_row"
+            app:layout_constraintTop_toBottomOf="@id/input_row"
+            tools:listitem="@layout/attachment" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/photo_picker_action"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="0dp"
+            android:background="@drawable/button_background"
+            android:padding="0dp"
+            android:src="@drawable/ic_attach"
+            app:layout_constraintBottom_toBottomOf="@+id/text_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_input" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -38,7 +38,10 @@ internal class AttachmentsRepo(private val context: Context) {
             "com.example.dnd.fileprovider"
     }
 
-    val allUris: ImmutableList<Uri>
+    val size: Int
+        get() = allUris.size
+
+    val allUris: List<Uri>
         get() {
             val files = attachmentsDir.listFiles()
             if (files == null || files.isEmpty()) {
@@ -65,7 +68,8 @@ internal class AttachmentsRepo(private val context: Context) {
             contentResolver.openInputStream(uri).use { input ->
                 requireNotNull(input) { uri.toString() }
                 attachmentsDir.mkdirs()
-                val fileName = "a-" + UUID.randomUUID().toString() + "." + ext
+                // We need to add a timestamp so that the attachments remain ordered correctly
+                val fileName = "${System.currentTimeMillis()}-${UUID.randomUUID()}.$ext"
                 val newAttachment = File(attachmentsDir, fileName)
                 FileOutputStream(newAttachment).use { output ->
                     // Copy the file
@@ -80,6 +84,10 @@ internal class AttachmentsRepo(private val context: Context) {
         }
     }
 
+    fun delete(position: Int) {
+        attachmentsDir.listFiles()?.getOrNull(position)?.delete()
+    }
+
     fun deleteAll() {
         val files = attachmentsDir.listFiles() ?: return
         for (file in files) {
@@ -90,4 +98,5 @@ internal class AttachmentsRepo(private val context: Context) {
     private fun getUriForFile(file: File): Uri {
         return FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITY, file)
     }
+
 }

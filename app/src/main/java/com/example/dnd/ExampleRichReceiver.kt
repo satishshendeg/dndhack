@@ -41,7 +41,7 @@ class ExampleRichReceiver : AppCompatActivity() {
         AttachmentsRepo(this)
     }
     private val attachmentsRecyclerViewAdapter by lazy {
-        AttachmentsRecyclerViewAdapter(attachmentsRepo.allUris)
+        AttachmentsRecyclerViewAdapter(attachmentsRepo)
     }
     private val receiver by lazy {
         MediaReceiver(attachmentsRepo, attachmentsRecyclerViewAdapter)
@@ -65,9 +65,10 @@ class ExampleRichReceiver : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(toolbar)
 
-        val attachmentsRecyclerView: RecyclerView = findViewById(R.id.attachments_recycler_view)
-        attachmentsRecyclerView.setHasFixedSize(true)
-        attachmentsRecyclerView.setAdapter(this.attachmentsRecyclerViewAdapter)
+        findViewById<RecyclerView>(R.id.attachments_list).apply {
+            setHasFixedSize(true)
+            setAdapter(attachmentsRecyclerViewAdapter)
+        }
 
         // Attach this receiver to both the text field...
         ViewCompat.setOnReceiveContentListener(
@@ -112,12 +113,11 @@ class ExampleRichReceiver : AppCompatActivity() {
         }
         Futures.addCallback(deleteAllFuture, object : FutureCallback<Void?> {
             override fun onSuccess(result: Void?) {
-                attachmentsRecyclerViewAdapter.clearAttachments()
                 attachmentsRecyclerViewAdapter.notifyItemRangeRemoved(0, attachmentsCount)
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("ExampleRichReceiver", "Error deleting attachments", t)
+                Log.e("ReceiveContentDemo", "Error deleting attachments", t)
             }
         }, Executors.main())
     }

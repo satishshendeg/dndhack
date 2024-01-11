@@ -92,7 +92,7 @@ internal class MediaReceiver(
             val localUris: MutableList<Uri> = ArrayList(uris.size)
             for (uri in uris) {
                 val mimeType = applicationContext.contentResolver.getType(uri)
-                Log.i("MediaReceiver", "Processing URI: $uri (type: $mimeType)")
+                Log.i("ReceiveContentDemo", "Processing URI: $uri (type: $mimeType)")
                 if (ClipDescription.compareMimeTypes(mimeType, "image/*")) {
                     // Read the image at the given URI and write it to private storage.
                     localUris.add(attachmentsRepo.write(uri))
@@ -106,13 +106,12 @@ internal class MediaReceiver(
             override fun onSuccess(localUris: List<Uri>) {
                 // Show the image in the UI by passing the URI pointing to the locally stored copy
                 // to the recycler view adapter.
-                attachmentsRecyclerViewAdapter.addAttachments(localUris)
                 attachmentsRecyclerViewAdapter.notifyDataSetChanged()
-                Log.i("MediaReceiver", "Processed content: $localUris")
+                Log.i("ReceiveContentDemo", "Processed content: $localUris")
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("MediaReceiver", "Error processing content", t)
+                Log.e("ReceiveContentDemo", "Error processing content", t)
             }
         }, main())
     }
@@ -133,13 +132,13 @@ internal class MediaReceiver(
                 fd = contentResolver.openAssetFileDescriptor(uri, "r")
                 fd!!.length
             } catch (e: FileNotFoundException) {
-                Log.e("MediaReceiver", "Error opening content URI: $uri", e)
+                Log.e("ReceiveContentDemo", "Error opening content URI: $uri", e)
                 return@execute
             } finally {
                 fd?.close()
             }
             val msg = "Content of type $mimeType ($lengthBytes bytes): $uri"
-            Log.i("MediaReceiver", msg)
+            Log.i("ReceiveContentDemo", msg)
             main().execute { Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show() }
         }
     }
