@@ -106,8 +106,12 @@ internal class MediaReceiver(
             override fun onSuccess(localUris: List<Uri>) {
                 // Show the image in the UI by passing the URI pointing to the locally stored copy
                 // to the recycler view adapter.
-                attachmentsRecyclerViewAdapter.notifyDataSetChanged()
-                Log.i("ReceiveContentDemo", "Processed content: $localUris")
+                val start = attachmentsRepo.size - localUris.size
+                val end = localUris.size
+                attachmentsRecyclerViewAdapter.notifyItemRangeInserted(
+                    start, end
+                )
+                Log.i("ReceiveContentDemo", "Added content $end item(s) from position #$start: $localUris")
             }
 
             override fun onFailure(t: Throwable) {

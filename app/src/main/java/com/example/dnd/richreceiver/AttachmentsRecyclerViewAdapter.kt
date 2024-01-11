@@ -1,5 +1,6 @@
 package com.example.dnd.richreceiver
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
@@ -31,11 +32,13 @@ internal class AttachmentsRecyclerViewAdapter(private val attachments: Attachmen
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val uri = attachments.allUris[position]
+        val uri = attachments.allUris[holder.adapterPosition]
         holder.attachmentThumbnailView.setImageURI(uri)
         holder.deleteAttachment.setOnClickListener {
+            Log.d("AttachmentsRecyclerViewAdapter", "deleting item at position ${holder.adapterPosition}")
             attachments.delete(holder.adapterPosition)
-            notifyItemRemoved(position)
+            notifyItemRemoved(holder.adapterPosition)
+            holder.itemView.parent.requestLayout()
         }
     }
 
