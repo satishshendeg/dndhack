@@ -32,5 +32,8 @@ class MainActivity : AppCompatActivity() {
         viewBinding.btnToOtherApp.setOnClickListener {
             startActivity(Intent(this, ExampleMultiWindowDnd::class.java))
         }
+        viewBinding.btnDndCustomView.setOnClickListener {
+            startActivity(Intent(this, ExampleDefaultDnd::class.java))
+        }
     }
 }

@@ -40,6 +40,7 @@
 
         <activity android:name=".ExampleComposeActivity" />
         <activity android:name=".ExampleMultiWindowDnd" />
+        <activity android:name=".ExampleDefaultDnd" />
     </application>
 
 </manifest>
