@@ -93,21 +93,14 @@ class ExampleRichReceiver : AppCompatActivity() {
         findViewById<AppCompatImageButton>(R.id.photo_picker_action).setOnClickListener {
             pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.app_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_clear_attachments -> {
-                deleteAllAttachments()
-                true
-            }
-
-            else -> false
+        findViewById<AppCompatImageButton>(R.id.send).setOnClickListener {
+            Toast.makeText(
+                this,
+                "Sent the message with ${attachmentsRepo.size} attachments!",
+                Toast.LENGTH_LONG
+            ).show()
+            deleteAllAttachments()
         }
     }
 
