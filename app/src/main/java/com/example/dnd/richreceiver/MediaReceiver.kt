@@ -23,8 +23,8 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.example.dnd.richreceiver.MyExecutors.bg
-import com.example.dnd.richreceiver.MyExecutors.main
+import com.example.dnd.richreceiver.Executors.bg
+import com.example.dnd.richreceiver.Executors.main
 import androidx.core.view.ContentInfoCompat
 import androidx.core.view.OnReceiveContentListener
 import com.google.common.util.concurrent.FutureCallback
@@ -35,9 +35,9 @@ import java.io.FileNotFoundException
  * Sample [OnReceiveContentListener] implementation that accepts all URIs, and delegates
  * handling for all other content to the platform.
  */
-internal class MyReceiver(
-    private val mAttachmentsRepo: AttachmentsRepo,
-    private val mAttachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
+internal class MediaReceiver(
+    private val attachmentsRepo: AttachmentsRepo,
+    private val attachmentsRecyclerViewAdapter: AttachmentsRecyclerViewAdapter
 ) : OnReceiveContentListener {
     companion object {
         val SUPPORTED_MIME_TYPES = arrayOf("image/*")
@@ -83,17 +83,19 @@ internal class MyReceiver(
      * the content).
      */
     private fun receive(context: Context, payload: ContentInfoCompat) {
+        receive(context, collectUris(payload.clip))
+    }
+
+    fun receive(context: Context, uris: List<Uri>) {
         val applicationContext = context.applicationContext
-        val contentResolver = applicationContext.contentResolver
         val addAttachmentsFuture = bg().submit<List<Uri>> {
-            val uris = collectUris(payload.clip)
             val localUris: MutableList<Uri> = ArrayList(uris.size)
             for (uri in uris) {
-                val mimeType = contentResolver.getType(uri)
+                val mimeType = applicationContext.contentResolver.getType(uri)
                 Log.i("ReceiveContentDemo", "Processing URI: $uri (type: $mimeType)")
                 if (ClipDescription.compareMimeTypes(mimeType, "image/*")) {
                     // Read the image at the given URI and write it to private storage.
-                    localUris.add(mAttachmentsRepo.write(uri))
+                    localUris.add(attachmentsRepo.write(uri))
                 } else {
                     showMessage(applicationContext, uri, mimeType!!)
                 }
@@ -104,13 +106,16 @@ internal class MyReceiver(
             override fun onSuccess(localUris: List<Uri>) {
                 // Show the image in the UI by passing the URI pointing to the locally stored copy
                 // to the recycler view adapter.
-                mAttachmentsRecyclerViewAdapter.addAttachments(localUris)
-                mAttachmentsRecyclerViewAdapter.notifyDataSetChanged()
-                Log.i("ReceiveContentDemo", "Processed content: $payload")
+                val start = attachmentsRepo.size - localUris.size
+                val end = localUris.size
+                attachmentsRecyclerViewAdapter.notifyItemRangeInserted(
+                    start, end
+                )
+                Log.i("ReceiveContentDemo", "Added content $end item(s) from position #$start: $localUris")
             }
 
             override fun onFailure(t: Throwable) {
-                Log.e("ReceiveContentDemo", "Error processing content: $payload", t)
+                Log.e("ReceiveContentDemo", "Error processing content", t)
             }
         }, main())
     }

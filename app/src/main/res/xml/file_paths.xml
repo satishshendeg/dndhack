@@ -16,5 +16,5 @@
   -->
 
 <paths>
-    <files-path name="my_attachments" path="attachments/"/>
+    <files-path name="attachments" path="attachments/"/>
 </paths>
