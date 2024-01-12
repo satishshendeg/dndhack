@@ -29,5 +29,8 @@ class MainActivity : AppCompatActivity() {
         viewBinding.btnComposeImpl.setOnClickListener {
             startActivity(Intent(this, ExampleComposeActivity::class.java))
         }
+        viewBinding.btnToOtherApp.setOnClickListener {
+            startActivity(Intent(this, ExampleMultiWindowDnd::class.java))
+        }
     }
 }
