@@ -18,13 +18,16 @@ package com.example.dnd
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
+import androidx.draganddrop.DropHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dnd.richreceiver.AttachmentsRecyclerViewAdapter
 import com.example.dnd.richreceiver.AttachmentsRepo
@@ -36,6 +39,9 @@ import com.google.common.util.concurrent.ListenableFuture
 
 /** Main activity for the app.  */
 class ExampleRichReceiver : AppCompatActivity() {
+    companion object {
+        private const val USE_DROP_HELPER = true
+    }
 
     private val attachmentsRepo by lazy {
         AttachmentsRepo(this)
@@ -75,18 +81,34 @@ class ExampleRichReceiver : AppCompatActivity() {
         }
         attachmentsRepo.refresh()
 
-        // Attach this receiver to both the text field...
-        ViewCompat.setOnReceiveContentListener(
-            findViewById(R.id.text_input),
-            MediaReceiver.SUPPORTED_MIME_TYPES,
-            receiver
-        )
-        // ... and its larger container
-        ViewCompat.setOnReceiveContentListener(
-            findViewById(R.id.container),
-            MediaReceiver.SUPPORTED_MIME_TYPES,
-            receiver
-        )
+        val textInput = findViewById<AppCompatEditText>(R.id.text_input)
+        val container = findViewById<ViewGroup>(R.id.container)
+        if (USE_DROP_HELPER) {
+            DropHelper.configureView(
+                this,
+                container,
+                MediaReceiver.SUPPORTED_MIME_TYPES,
+                DropHelper.Options.Builder()
+                    .setHighlightColor(getColor(R.color.gray))
+                    .setHighlightCornerRadiusPx(16.px)
+                    .addInnerEditTexts(textInput)
+                    .build(),
+                receiver
+            )
+        } else {
+            // Attach this receiver to both the text field...
+            ViewCompat.setOnReceiveContentListener(
+                textInput,
+                MediaReceiver.SUPPORTED_MIME_TYPES,
+                receiver
+            )
+            // ... and its larger container
+            ViewCompat.setOnReceiveContentListener(
+                container,
+                MediaReceiver.SUPPORTED_MIME_TYPES,
+                receiver
+            )
+        }
 
         // Explore the possibility to support a file picker as well
         //filePicker.attach(findViewById(R.id.text_input), MyReceiver.SUPPORTED_MIME_TYPES)

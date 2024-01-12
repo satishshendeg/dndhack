@@ -95,8 +95,7 @@
                 android:padding="0dp"
                 android:src="@drawable/ic_attach"
                 app:layout_constraintBottom_toBottomOf="@+id/text_input"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/text_input" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -104,6 +103,7 @@
             android:id="@+id/send"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_gravity="bottom"
             android:layout_margin="0dp"
             android:background="@drawable/button_background"
             android:padding="0dp"
