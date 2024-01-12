@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Rich Content demo</string>
-    <string name="app_menu_item_clear_attachments">Clear attachments</string>
+    <string name="dd_views">D&amp;D: Views</string>
+    <string name="dd_drop_helper">D&amp;D: DropHelper</string>
+    <string name="dd_in_compose">D&amp;D: Compose</string>
+    <string name="dd_to_other_app">D&amp;D: To other App</string>
+    <string name="dd_custom_view">D&amp;D: Custom view</string>
+    <string name="rich_receiver">InputText with rich content</string>
     <string name="text_input_default_text">Send text or images</string>
 </resources>
