@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".ExampleViewActivity" />
         <activity android:name=".ExampleDndHelperActivity" />
+        <activity android:name=".ExampleComposeActivity" />
     </application>
 
 </manifest>

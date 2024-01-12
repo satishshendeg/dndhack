@@ -21,5 +21,8 @@ class MainActivity : AppCompatActivity() {
         viewBinding.btnDnDHelperImpl.setOnClickListener {
             startActivity(Intent(this, ExampleDndHelperActivity::class.java))
         }
+        viewBinding.btnComposeImpl.setOnClickListener {
+            startActivity(Intent(this, ExampleComposeActivity::class.java))
+        }
     }
 }
