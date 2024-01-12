@@ -26,5 +26,14 @@ class MainActivity : AppCompatActivity() {
         viewBinding.btnRichReceiver.setOnClickListener {
             startActivity(Intent(this, ExampleRichReceiver::class.java))
         }
+        viewBinding.btnComposeImpl.setOnClickListener {
+            startActivity(Intent(this, ExampleComposeActivity::class.java))
+        }
+        viewBinding.btnToOtherApp.setOnClickListener {
+            startActivity(Intent(this, ExampleMultiWindowDnd::class.java))
+        }
+        viewBinding.btnDndCustomView.setOnClickListener {
+            startActivity(Intent(this, ExampleDefaultDnd::class.java))
+        }
     }
 }
